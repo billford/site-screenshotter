@@ -13,6 +13,11 @@ import json
 import sys
 from pathlib import Path
 
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:
+    sync_playwright = None  # type: ignore[assignment]
+
 
 def load_config(path: Path) -> dict:
     try:
@@ -34,9 +39,7 @@ def pages_from_dir(html_dir: Path, out_dir: Path, cfg: dict) -> list:
 
 
 def take_screenshots(pages: list, cfg: dict) -> None:
-    try:
-        from playwright.sync_api import sync_playwright  # pylint: disable=import-outside-toplevel
-    except ImportError:
+    if sync_playwright is None:
         print("[screenshotter] playwright not installed. Run: pip install playwright && playwright install chromium")
         sys.exit(1)
 
