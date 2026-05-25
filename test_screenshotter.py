@@ -1,3 +1,4 @@
+# pylint: disable=missing-function-docstring,missing-class-docstring
 """Tests for screenshotter.py — config loading, directory scanning, and argument parsing."""
 
 import json
@@ -43,7 +44,7 @@ class TestPagesFromDir(unittest.TestCase):
             (tmp / "index.html").write_text("<html></html>")
             (tmp / "about.html").write_text("<html></html>")
             (tmp / "style.css").write_text("body {}")
-            pages = screenshotter.pages_from_dir(tmp, Path("shots"), {})
+            pages = screenshotter.pages_from_dir(tmp, Path("shots"))
         names = [Path(p["output"]).name for p in pages]
         self.assertIn("index.png", names)
         self.assertIn("about.png", names)
@@ -52,25 +53,25 @@ class TestPagesFromDir(unittest.TestCase):
 
     def test_empty_directory_returns_empty_list(self):
         with tempfile.TemporaryDirectory() as d:
-            pages = screenshotter.pages_from_dir(Path(d), Path("shots"), {})
+            pages = screenshotter.pages_from_dir(Path(d), Path("shots"))
         self.assertEqual(pages, [])
 
     def test_nonexistent_dir_returns_empty_list(self):
-        pages = screenshotter.pages_from_dir(Path("/no/such/dir"), Path("shots"), {})
+        pages = screenshotter.pages_from_dir(Path("/no/such/dir"), Path("shots"))
         self.assertEqual(pages, [])
 
     def test_output_path_uses_out_dir(self):
         with tempfile.TemporaryDirectory() as d:
             tmp = Path(d)
             (tmp / "dash.html").write_text("<html></html>")
-            pages = screenshotter.pages_from_dir(tmp, Path("my_shots"), {})
+            pages = screenshotter.pages_from_dir(tmp, Path("my_shots"))
         self.assertTrue(pages[0]["output"].startswith("my_shots"))
 
     def test_url_is_file_uri(self):
         with tempfile.TemporaryDirectory() as d:
             tmp = Path(d)
             (tmp / "index.html").write_text("<html></html>")
-            pages = screenshotter.pages_from_dir(tmp, Path("shots"), {})
+            pages = screenshotter.pages_from_dir(tmp, Path("shots"))
         self.assertTrue(pages[0]["url"].startswith("file://"))
 
 

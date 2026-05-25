@@ -20,6 +20,7 @@ except ImportError:
 
 
 def load_config(path: Path) -> dict:
+    """Load and return a JSON config file, exiting with an error if missing or malformed."""
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError) as exc:
@@ -27,8 +28,8 @@ def load_config(path: Path) -> dict:
         sys.exit(1)
 
 
-def pages_from_dir(html_dir: Path, out_dir: Path, cfg: dict) -> list:
-    """Build page list from every .html file in a directory."""
+def pages_from_dir(html_dir: Path, out_dir: Path) -> list:
+    """Return a page-list dict for every .html file found in html_dir."""
     return [
         {
             "url": p.as_uri(),
@@ -39,6 +40,7 @@ def pages_from_dir(html_dir: Path, out_dir: Path, cfg: dict) -> list:
 
 
 def take_screenshots(pages: list, cfg: dict) -> None:
+    """Render each page in a headless browser and save a PNG to the configured output path."""
     if sync_playwright is None:
         print("[screenshotter] playwright not installed. Run: pip install playwright && playwright install chromium")
         sys.exit(1)
@@ -67,6 +69,7 @@ def take_screenshots(pages: list, cfg: dict) -> None:
 
 
 def main() -> None:
+    """Parse arguments and run in quick mode (directory) or config mode."""
     parser = argparse.ArgumentParser(description="Headless screenshots of HTML pages.")
     parser.add_argument("html_dir", nargs="?", help="Quick mode: directory of .html files")
     parser.add_argument("--config", default="config.json", help="Path to JSON config file")
@@ -74,10 +77,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.html_dir:
-        # Quick mode — no config file needed
         html_dir = Path(args.html_dir)
         out_dir  = Path(args.out)
-        pages = pages_from_dir(html_dir, out_dir, {})
+        pages = pages_from_dir(html_dir, out_dir)
         if not pages:
             print(f"[screenshotter] No .html files found in {html_dir}", file=sys.stderr)
             sys.exit(1)
