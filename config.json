@@ -1,0 +1,16 @@
+{
+  "viewport_width": 1400,
+  "viewport_height": 900,
+  "settle_ms": 1500,
+  "full_page": true,
+  "pages": [
+    {
+      "url": "file:///path/to/docs/index.html",
+      "output": "screenshots/index.png"
+    },
+    {
+      "url": "file:///path/to/docs/dashboard.html",
+      "output": "screenshots/dashboard.png"
+    }
+  ]
+}
