@@ -6,6 +6,37 @@ Headless screenshots of local or remote HTML pages using Playwright + Chromium. 
 
 ---
 
+## Example output
+
+<table>
+<tr>
+<td width="55%">
+  <img src="screenshots/dashboard.png" alt="Analytics dashboard screenshot">
+</td>
+<td valign="top" width="45%">
+
+### Analytics Dashboard
+
+Full-page screenshot of a Chart.js dashboard — stat tiles, a dual-axis daily traffic chart, hourly heatmap, altitude distribution, and a sortable anomaly log with live search. `settle_ms` gives the charts time to finish rendering before the shutter fires.
+
+</td>
+</tr>
+<tr>
+<td width="55%">
+  <img src="screenshots/index.png" alt="Daily briefings index screenshot">
+</td>
+<td valign="top" width="45%">
+
+### Briefings Index
+
+A simple list page — no JS, loads instantly. Quick mode picks this up automatically alongside the dashboard just by pointing at the `docs/` directory.
+
+</td>
+</tr>
+</table>
+
+---
+
 ## Setup
 
 ```bash
