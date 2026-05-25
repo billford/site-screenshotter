@@ -1,33 +1,57 @@
 # site-screenshotter
 
-Headless screenshots of local or remote HTML pages, using Playwright + Chromium. Drop it into any static site project to keep README images current.
+Headless screenshots of local or remote HTML pages using Playwright + Chromium. Useful for keeping README images current without manual browser work.
 
-## Install
+**Requires Python 3.9+**
+
+---
+
+## Setup
 
 ```bash
-pip install playwright
+git clone https://github.com/billford/site-screenshotter.git
+cd site-screenshotter
+
+pip install -r requirements.txt
 playwright install chromium
 ```
 
-## Usage
+That's it — no other dependencies.
 
-### Quick mode — screenshot every `.html` file in a directory
+---
+
+## Two ways to run it
+
+### Quick mode
+
+Point it at a directory and it screenshots every `.html` file it finds:
 
 ```bash
 python screenshotter.py docs/
-# → writes screenshots/<page>.png for each file
 ```
+
+Output lands in `screenshots/` by default, one PNG per HTML file:
+
+```
+screenshots/index.png
+screenshots/dashboard.png
+screenshots/about.png
+...
+```
+
+Use `--out` to change the output directory:
 
 ```bash
 python screenshotter.py docs/ --out shots/
-# → writes shots/<page>.png
 ```
 
-### Config mode — explicit pages with custom output paths
+### Config mode
+
+For more control — specific pages, custom output paths, remote URLs:
 
 ```bash
-python screenshotter.py                        # reads config.json
-python screenshotter.py --config myconf.json   # explicit config
+python screenshotter.py                        # reads config.json in current dir
+python screenshotter.py --config myconf.json   # explicit config file
 ```
 
 `config.json`:
@@ -40,35 +64,50 @@ python screenshotter.py --config myconf.json   # explicit config
   "full_page": true,
   "pages": [
     {
-      "url": "file:///path/to/docs/index.html",
+      "url": "file:///Users/you/myproject/docs/index.html",
       "output": "screenshots/index.png"
     },
     {
+      "url": "file:///Users/you/myproject/docs/dashboard.html",
+      "output": "screenshots/dashboard.png"
+    },
+    {
       "url": "https://example.com",
-      "output": "screenshots/example.png"
+      "output": "screenshots/example-live.png"
     }
   ]
 }
 ```
 
-### Config options
+#### Config options
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `viewport_width` | `1400` | Browser window width in px |
-| `viewport_height` | `900` | Browser window height in px |
-| `settle_ms` | `1500` | Wait after page load (ms) — gives JS charts time to render |
-| `full_page` | `true` | Capture full scrollable page height |
+| `viewport_width` | `1400` | Browser window width in pixels |
+| `viewport_height` | `900` | Browser window height in pixels |
+| `settle_ms` | `1500` | Extra wait after page load (ms). Increase if JS charts or animations are still rendering. |
+| `full_page` | `true` | Capture the full scrollable page, not just the visible viewport |
+
+---
 
 ## Wiring into a build script
 
+Run it at the end of your build and commit the updated PNGs automatically:
+
 ```bash
-# At the end of your build_and_push.sh:
-python screenshotter.py --config screenshotter.json
+# build_and_push.sh
+
+python build_site.py
+
+python screenshotter.py --config config.json
 git add screenshots/
 git diff --cached --quiet || git commit -m "screenshots: update"
+
+git push
 ```
+
+---
 
 ## How it works
 
-Playwright drives a headless Chromium instance. `wait_until="networkidle"` ensures the page has finished loading, then `settle_ms` gives client-side chart libraries (Chart.js, D3, etc.) time to finish rendering before the screenshot is taken. Both `file://` and `http://` URLs work.
+Playwright launches a headless Chromium instance and navigates to each URL. `wait_until="networkidle"` holds until the page stops making network requests, then `settle_ms` adds a fixed delay on top — giving client-side rendering (Chart.js, D3, etc.) time to finish drawing before the shutter fires. Both `file://` and `http(s)://` URLs work.
